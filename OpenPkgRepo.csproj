@@ -10,7 +10,8 @@
     <PackageReference Include="HttpMultipartParser" Version="8.1.0" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.4" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Pixel.OakLog" Version="1.0.0" />
+    <PackageReference Include="Pixel.OakLog" Version="1.1.0" />
+    <PackageReference Include="Pixel.Pkg" Version="1.0.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageReference Include="NetCoreServer" Version="7.0.0" />

@@ -7,7 +7,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Newtonsoft.Json.Linq;
-using OakLogger;
+using Pixel.OakLog;
 
 namespace OpenPkgRepo;
 
@@ -82,10 +82,10 @@ public static class PkgRepo
     private static void InitServer()
     {
         // Logger utilities.
-        LogSuccess = BuildLogger("SUCCESS", new(0, 175, 0));
-        LogWarning = BuildLogger("WARNING", new(255, 204, 0));
-        LogError = BuildLogger("ERROR", new(250, 0, 0));
-        LogInfo = BuildLogger("INFO", new	(84, 175, 190));
+        LogSuccess = OLog.Create("SUCCESS", (0, 175, 0));
+        LogWarning = OLog.Create("WARNING", (255, 204, 0));
+        LogError = OLog.Create("ERROR", (250, 0, 0));
+        LogInfo = OLog.Create("INFO", (84, 175, 190));
         // Load config.
         if (!File.Exists(_configPath))
         {
@@ -126,21 +126,6 @@ public static class PkgRepo
     /// <returns>
     /// An OLog logger that has a stylized output.
     /// </returns>
-    public static OLog BuildLogger(string loggerType, Tuple<byte, byte, byte> color)
-    {
-        var standardLogItems = new List<LogItem> { LogItem.Type, LogItem.TimeSinceStartup };
-        var standardLogOutput = new LogOutput(Console.Out, useColor: true);
-        
-        OLog logger = new()
-        {
-            LogType = loggerType,
-            Color = color
-        };
-        logger.Outputs.Add(standardLogOutput);
-        logger.LogItems.InsertRange(0, standardLogItems);
-        return logger;
-    }
-
     private static readonly List<(string, string, string)> _defaultConfigValue = new()
     {
         ( "Port", "1433", "The port used by the server" ),
