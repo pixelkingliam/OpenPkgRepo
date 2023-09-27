@@ -22,7 +22,8 @@ public enum ErrorCode
     InvalidImage,
     MustBeSquare,
     ExpiredSession,
-    InvalidSession
+    InvalidSession,
+    BadRequest
 }
 
 public static class PkgRepo
@@ -45,7 +46,8 @@ public static class PkgRepo
         {ErrorCode.InvalidImage, BuildErrorMsg(6,"The provided file is not a valid image!.")},
         {ErrorCode.MustBeSquare, BuildErrorMsg(7,"The provided image is not 1:1 aspect ratio, the server requires a square image!.")},
         {ErrorCode.ExpiredSession, BuildErrorMsg(8,"This session has expired and can no longer be used.")},
-        {ErrorCode.InvalidSession, BuildErrorMsg(9,"Could not find the session.")}
+        {ErrorCode.InvalidSession, BuildErrorMsg(9,"Could not find the session.")},
+        {ErrorCode.BadRequest, BuildErrorMsg(10,"Invalid request in body.")}
     };
 
     public static async Task Main(string[] args)
@@ -104,7 +106,13 @@ public static class PkgRepo
         using (var command = Database.CreateCommand())
         {
             command.CommandText = @"
-            CREATE TABLE IF NOT EXISTS Accounts (AccountsID INTEGER PRIMARY KEY,Username, Password, Location, BirthDate, Bio) ";
+            CREATE TABLE IF NOT EXISTS Accounts (Id INTEGER PRIMARY KEY,Username TEXT, Password TEXT, Location TEXT, BirthDate TEXT, Bio TEXT) ";
+            command.ExecuteNonQuery();
+        }
+          using (var command = Database.CreateCommand())
+        {
+            command.CommandText = @"
+            CREATE TABLE IF NOT EXISTS Posts (Id INTEGER PRIMARY KEY,Owner INTEGER, Name TEXT, Description TEXT, Body TEXT)";
             command.ExecuteNonQuery();
         } 
         // Server WebServer = new Server("*", Convert.ToInt32(Configuration["Port"]), false);
