@@ -1,54 +1,61 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using NetCoreServer;
 using Newtonsoft.Json.Linq;
-using Pixel.OakLog;
+using ModdableWebServer.Attributes;
+using ModdableWebServer;
+using ModdableWebServer.Helper;
 
 namespace OpenPkgRepo.Routes;
 
-[RouteClass]
-class RoutePost : StaticRoute
+class RoutePost
 {
-    public override string RouteUrl => "/post";
-    public override HttpResponse PutResponse(HttpContext ctx)
+    [HTTP("PUT", "/post")]
+    public static bool PutPostResponse(HttpRequest request, ServerStruct serverStruct)
     {
         var response = new HttpResponse(200);
         Session session;
-        if (ctx.Headers["Session"] != null)
+        if (serverStruct.Headers["Session"] != null)
         {
-            if (PkgRepo.Sessions.All(i => i.Id != ctx.Headers["Session"]))
+            if (PkgRepo.Sessions.All(i => i.Id != serverStruct.Headers["Session"]))
             {
                 response = new HttpResponse(409);
                 response.SetBody(PkgRepo.ErrorResponse[ErrorCode.InvalidSession].ToString());
-                return response;
+                serverStruct.Response = response;
+                serverStruct.SendResponse();
+                return true;
             }
         }
         else
         {
             response = new HttpResponse(409);
             response.SetBody(PkgRepo.ErrorResponse[ErrorCode.InvalidSession].ToString());
-            return response;
+            serverStruct.Response = response;
+            serverStruct.SendResponse();
+            return true;
         }
-        session = PkgRepo.Sessions.FirstOrDefault(i => i.Id == ctx.Headers["Session"]);
+        session = PkgRepo.Sessions.FirstOrDefault(i => i.Id == serverStruct.Headers["Session"]);
 
         JObject createBody;
         try
         {
-            createBody = JObject.Parse(ctx.Request.Body);
+            createBody = JObject.Parse(request.Body);
         }
         catch (Exception)
         {
             response = new HttpResponse(409);
             response.SetBody(PkgRepo.ErrorResponse[ErrorCode.BadRequest].ToString());
-            return response;
+            serverStruct.Response = response;
+            serverStruct.SendResponse();
+            return true;
         }
         if (!createBody.ContainsKey("Name") || !createBody.ContainsKey("Description") || !createBody.ContainsKey("Body"))
         {
             response = new HttpResponse(409);
             response.SetBody(PkgRepo.ErrorResponse[ErrorCode.BadRequest].ToString());
-            return response;
+            serverStruct.Response = response;
+            serverStruct.SendResponse();
+            return true;
         }
         var post = new Post()
         {
@@ -57,7 +64,9 @@ class RoutePost : StaticRoute
             Description = (string)createBody["Description"],
             Body = (string)createBody["Body"]
         };
-        return response;
+        serverStruct.Response = response;
+        serverStruct.SendResponse();
+        return true;
     }
 
 }

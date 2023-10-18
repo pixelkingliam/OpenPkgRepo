@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Newtonsoft.Json.Linq;
 using Pixel.OakLog;
+using ModdableWebServer.Servers;
+using ModdableWebServer.Helper;
+using System.Reflection;
 
 namespace OpenPkgRepo;
 
@@ -116,7 +119,8 @@ public static class PkgRepo
             command.ExecuteNonQuery();
         } 
         // Server WebServer = new Server("*", Convert.ToInt32(Configuration["Port"]), false);
-        var webServer = new OPRServer(IPAddress.Any, Convert.ToInt32(Configuration["Port"]));
+        var webServer = new HTTP_Server("0.0.0.0", Convert.ToInt32(Configuration["Port"]));
+        webServer.AttributeToMethods.Merge(Assembly.GetAssembly(typeof(Hash)));
         webServer.Start();
 
         LogSuccess.Print("Server is running!");
